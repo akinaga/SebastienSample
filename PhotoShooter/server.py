@@ -97,9 +97,12 @@ def request_handler(event, context):
         while True:
             gevent.sleep(0.5)
             if response != "":
+                print "respose :", response
                 break
         sentense = response
         response = ""
+
+        print "sentense :", sentense
 
     return json.dumps(
         None,
