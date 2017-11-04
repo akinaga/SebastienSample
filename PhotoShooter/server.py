@@ -48,16 +48,21 @@ def websocket():
         user_id = client_info.get('user_id')
         orderitem[user_id] = {}
 
+        print "Connect : " + user_id
+
         while True:
+            print orderitem
             if user_id != "" and orderitem.get(user_id):
+                print user_id, "recv", "photo"
                 ret = get_data(user_id, "photo")
                 if ret != "":
+                    print user_id, "send", "photo"
                     ws.send(json.dumps({'user_id': user_id, 'name': "photo", 'value': ret}))
                     message = ws.receive()
                     # 受けとったあとの処理
                     response = "写真を撮ったよ"
 
-            gevent.sleep(0.3)
+            gevent.sleep(1.0)
 
 
 def put_data(user_id, queuename, value):
@@ -78,17 +83,19 @@ def get_data(user_id, queuename):
         return ""
 
 
-
-
 def request_handler(event, context):
     global response
     intent = event["args"]["intent"]
     utterance = event["args"]["utterance"]
-    user_id = event["user_id"]
+    # user_id = event["user_id"]
+    user_id = "test001"
+    sentense = "良くわかりませんでした"
 
     if intent == "photo":
-        put_data(user_id, 'photo', "")
+        print user_id, "photo"
+        put_data(user_id, 'photo', "photo")
         while True:
+            gevent.sleep(0.5)
             if response != "":
                 break
         sentense = response

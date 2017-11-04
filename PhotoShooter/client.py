@@ -15,7 +15,7 @@ if os.path.exists('user_id'):
 else:
     user_id = "test001"
 
-SERVER_ENDPOINT = "http://akinaga.cshhage.net/websocket"
+SERVER_ENDPOINT = "ws://akinaga.cshhage.net:4000/websocket"
 ws = create_connection(SERVER_ENDPOINT)
 
 
@@ -26,12 +26,10 @@ def handler(signal, frame):
 
 def takePicture():
     filename = str(uuid.uuid4()) + ".jpg"
-    hoge = pygame.mixer.Sound("camera.wav")
-    hoge.play()
     r = capture_pi_camera('/dev/shm/' + filename)
     filename = '/dev/shm/' + filename
 
-    background = pygame.image.load('/dev/shm/' + filename).convert()
+    background = pygame.image.load(filename).convert()
     screen.blit(background, (80, 0))
     pygame.display.update()
     return filename
@@ -70,6 +68,7 @@ def main():
             filename = takePicture()
 
             # この後写真の処理を書いて下さい
+            ws.send(json.dumps(items, indent=2))
 
 
 if __name__ == "__main__":
