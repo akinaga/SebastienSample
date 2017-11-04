@@ -6,6 +6,7 @@ from websocket import create_connection
 import uuid
 import picamera
 import os
+import base64
 
 
 pygame.mixer.init()
@@ -27,9 +28,8 @@ def handler(signal, frame):
 def takePicture():
     filename = str(uuid.uuid4()) + ".jpg"
     r = capture_pi_camera('/dev/shm/' + filename)
-    filename = '/dev/shm/' + filename
 
-    background = pygame.image.load(filename).convert()
+    background = pygame.image.load('/dev/shm/' + filename).convert()
     screen.blit(background, (80, 0))
     pygame.display.update()
     return filename
@@ -67,8 +67,10 @@ def main():
             # 写真を撮る処理とか
             filename = takePicture()
 
-            # この後写真の処理を書いて下さい
-            ws.send(json.dumps(items, indent=2))
+            # 写真の送信
+            img = open('/dev/shm/' + filename, 'rt').read()
+            img_txt = base64.b64encode(img)
+            ws.send(json.dumps({'filename': filename, "img": img_txt}, indent=2))
 
 
 if __name__ == "__main__":
