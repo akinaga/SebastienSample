@@ -100,7 +100,6 @@ def request_handler(event, context):
     print sentense
 
     return json.dumps(
-        None,
         {"error_code": "success",
          "status": "true",
          "user_id": event["user_id"],

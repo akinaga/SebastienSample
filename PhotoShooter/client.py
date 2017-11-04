@@ -16,7 +16,8 @@ if os.path.exists('user_id'):
 else:
     user_id = "test001"
 
-SERVER_ENDPOINT = "ws://akinaga.cshhage.net:4000/websocket"
+SERVERNAME = "hogehoge.com:4000"
+SERVER_ENDPOINT = "ws://" + SERVERNAME + "/websocket"
 ws = create_connection(SERVER_ENDPOINT)
 
 
