@@ -38,7 +38,6 @@ def main():
             filename = msgs.get('value')
             urllib.urlretrieve(FILESERVER + filename, '/dev/shm/' + filename)
             pygame.mixer.music.load("/dev/shm/" + filename)
-            pygame.mixer.music.set_volume(volume)
             pygame.mixer.music.play(1)
 
 
