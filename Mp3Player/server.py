@@ -10,6 +10,7 @@ import json
 import gevent
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
+import base64
 
 PORTNUMBER = 4001
 
@@ -83,6 +84,12 @@ def request_handler(event, context):
     if intent == "playmp3":
         # MP3のファイルをここで指定
         put_data(user_id, 'playback_audio', "potato.mp3")
+
+        # リモートのMP3を送信する場合はこちら
+        # mp3 = open('potato.mp3', 'rt').read()
+        # mp3_txt = base64.b64encode(mp3)
+        # put_data(user_id, 'playback_audio', mp3_txt)
+
         # 話す内容はここに記載。ただし、音とは同期しない
         sentense = "ポテトが出来ました"
     else:
