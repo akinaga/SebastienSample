@@ -20,9 +20,13 @@ Websocketベースですので、サーバーが別途必要です。WebSocket�
 |---|---|
 |Client|クライアントのソフトウェアです。Raspberry Pi上で動作させます。起動と同時にWebSocketをServerに対して張り、命令を待ちます。|
 |Server|サーバー側に配置します。PythonのFlaskベースで記述しています。EC2などのサーバー上に配置して利用下さい。|
-|Sebastien|[Developer Console](https://developers.sebastien.ai/)上でインテントの設定をして下さい。例１〜３での必要なインテントは異なります。
-|
+|Sebastien|[Developer Console](https://developers.sebastien.ai/)上でインテントの設定をして下さい。例１〜３での必要なインテントは異なります。|
 
+### インテントの設定方法
+下記の例ではMp3Playerのインテントの設定例です。
+![インテント設定例](img/ddb_sample.png)
+
+-------
 ## PhotoShooter
 ### シーケンス図
 ![Sanmple1](img/sample1.png)
