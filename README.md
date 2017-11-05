@@ -22,7 +22,7 @@ Websocketベースですので、サーバーが別途必要です。WebSocket�
 |Server|サーバー側に配置します。PythonのFlaskベースで記述しています。EC2などのサーバー上に配置して利用下さい。|
 
 ## PhotoShooter
-シーケンス図
+### シーケンス図
 ![Sanmple1](img/sample1.png)
 
 ### 利用上の注意
@@ -31,7 +31,7 @@ Websocketベースですので、サーバーが別途必要です。WebSocket�
 
 
 ## Mp3Player
-シーケンス図
+### シーケンス図
 ![Sanmple1](img/sample2.png)
 
 ### 利用上の注意
@@ -39,7 +39,7 @@ Websocketベースですので、サーバーが別途必要です。WebSocket�
 
 
 ## MusicPlayer
-シーケンス図
+### シーケンス図
 ![Sanmple1](img/sample3.png)
 
 ### 利用上の注意
