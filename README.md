@@ -13,19 +13,19 @@ These are sample codes of DOCOMO AI Agent (Sebastien)
 - iTunesから音楽を検索して、RaspberryPi上で鳴らすことが出来るデモです。
 
 ## Usage
-いずれのコードも2つのコンポーネントから出来ています。
+いずれのコードも2つのコンポーネント(Clientとサーバー)から出来ています。
+Websocketベースですので、サーバーが別途必要です。WebSocketなので、サーバーレスには出来ません。
 
 |対象|説明|
 |---|---|
 |Client|クライアントのソフトウェアです。Raspberry Pi上で動作させます。起動と同時にWebSocketをServerに対して張り、命令を待ちます。|
-|Server|サーバー側に配置します。PythonのFlaskベースで記載しています。EC2などのサーバー上に配置して利用下さい。|
-
+|Server|サーバー側に配置します。PythonのFlaskベースで記述しています。EC2などのサーバー上に配置して利用下さい。|
 
 ## PhotoShooter
 シーケンス図
 ![Sanmple1](img/sample1.png)
 
-###利用上の注意
+### 利用上の注意
 - サーバーのエンドポイントの設定はハードコートしていますので、適宜変更下さい。
 - マイクロソフトのFaceAPIのCredentialはハードコートしていますので、適宜変更下さい。
 
@@ -33,14 +33,16 @@ These are sample codes of DOCOMO AI Agent (Sebastien)
 ## Mp3Player
 シーケンス図
 ![Sanmple1](img/sample2.png)
-###利用上の注意
+
+### 利用上の注意
 - サーバーのエンドポイントの設定はハードコートしていますので、適宜変更下さい。
 
 
 ## MusicPlayer
 シーケンス図
 ![Sanmple1](img/sample3.png)
-###利用上の注意
+
+### 利用上の注意
 - サーバーのエンドポイントの設定はハードコートしていますので、適宜変更下さい。
 
 ## Licence
