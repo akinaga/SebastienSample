@@ -6,33 +6,30 @@ app = Flask(__name__)
 
 from flask import request
 from flask import make_response
-
 import json
+import base64
+import photo
+
 import gevent
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 
-import base64
-
+# ポート番号
 PORTNUMBER = 4000
 
-# 汎用キューの初期化
-orderitem = {}
-
-# 話す内容のキュー
-talk = ""
+# キューの初期化
+orderitem = {}  # 処理受け渡しキューの初期化
+talk = {}       # 会話内容のキュー
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'POST' and 'application/json' in request.headers.get('Content-Type', ""):
         event = request.json
-        print event
         response = make_response()
         response.status_code = 200
         talk_json = request_handler(event, "")
         response.data = talk_json
-        print talk_json
         response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return response
     else:
@@ -58,9 +55,13 @@ def websocket():
             if user_id != "" and orderitem.get(user_id):
                 ret = get_data(user_id, "photo")
                 if ret != "":
+                    # 写真撮影指示
                     ws.send(json.dumps({'user_id': user_id, 'name': "photo", 'value': ret}))
+
+                    # 写真の受信待ち
                     img_json = ws.receive()
-                    # 受けとったあとの処理
+
+                    # 写真の受信処理
                     img_dic = json.loads(img_json)
                     img_txt = img_dic.get('img')
                     filename = img_dic.get('filename')
@@ -69,7 +70,14 @@ def websocket():
                     f.write(img)
                     f.close()
 
-                    talk = "写真を撮ったよ"
+                    # 写真の処理
+                    result_json, sentense = photo.face_recognize(filename)
+                    print result_json
+                    print sentense
+                    talk[user_id] = sentense
+
+                    # 分析結果送信
+                    ws.send(json.dumps({'user_id': user_id, 'name': "result", 'value': result_json}))
 
             gevent.sleep(0.3)
 
@@ -96,8 +104,7 @@ def request_handler(event, context):
     global talk
     intent = event["args"]["intent"]
     utterance = event["args"]["utterance"]
-    # user_id = event["user_id"]
-    user_id = "test001"
+    user_id = event["user_id"]
     sentense = "良くわかりませんでした"
 
     if intent == "photo":
@@ -105,13 +112,11 @@ def request_handler(event, context):
         put_data(user_id, 'photo', "photo")
         while True:
             gevent.sleep(0.3)
-            if talk != "":
-                print "respose :", talk
+            if talk.get(user_id):
+                print "respose :", talk.get(user_id)
                 break
-        sentense = talk
-        talk = ""
-
-        print "sentense :", sentense
+        sentense = talk.get(user_id)
+        del talk[user_id]
 
     return json.dumps(
         {"error_code": "success",
