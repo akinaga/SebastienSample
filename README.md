@@ -13,14 +13,14 @@ These are sample codes of DOCOMO AI Agent (Sebastien)
 - iTunesから音楽を検索して、RaspberryPi上で鳴らすことが出来るデモです。
 
 ## Usage
-いずれのコードも2つのコンポーネント(Clientとサーバー)から出来ています。
+いずれのコードも2つのコンポーネント(クライアントとサーバー)から出来ています。
 Websocketベースですので、サーバーが別途必要です。WebSocketなので、サーバーレスには出来ません。
 
 |対象|説明|
 |---|---|
-|Client|クライアントのソフトウェアです。Raspberry Pi上で動作させます。起動と同時にWebSocketをServerに対して張り、命令を待ちます。|
-|Server|サーバー側に配置します。PythonのFlaskベースで記述しています。EC2などのサーバー上に配置して利用下さい。|
-|Sebastien|[Developer Console](https://developers.sebastien.ai/)上でインテントの設定をして下さい。例１〜３での必要なインテントは異なります。|
+|クライアント|クライアントのソフトウェアです(client.py)。Raspberry Pi上で動作させます。起動と同時にWebSocketをServerに対して張り、命令を待ちます。|
+|サーバー|サーバー側に配置します(server.py)。PythonのFlaskで実装しています。EC2などのサーバー上に配置して利用下さい。|
+|基盤上の設定|[Developer Console](https://developers.sebastien.ai/)上でインテントの設定をして下さい。例１〜３での必要なインテントは異なります。|
 
 ### インテントの設定方法
 下記の例ではMp3Playerのインテントの設定例です。
