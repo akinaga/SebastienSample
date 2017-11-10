@@ -1,15 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import pygame, json, sys, urllib, datetime, signal
+import pygame, json, sys, datetime, signal, base64
 from websocket import create_connection
 
 pygame.mixer.init()
 user_id = open('user_id', 'r').read()
 
-SERVER_ENDPOINT = "https://hogeserver.com/hoge"
-FILESERVER = "https://hogehoge.com/"
-ws = create_connection(SERVER_ENDPOINT)
+SERVER_ENDPOINT = "ws://hogehoge.com:4002/websocket"
 
 
 def handler(signal, frame):
@@ -18,9 +16,6 @@ def handler(signal, frame):
 
 
 def main():
-    pygame.init()
-
-    ws = create_connection(SERVER_ENDPOINT)
     items = {
         "user_id": user_id,
         "name": "init",
@@ -34,12 +29,19 @@ def main():
         message = ws.recv()
         msgs = json.loads(message)
 
+        if msgs.get('name') == 'stop' and 'value' in msgs:
+            pygame.mixer.music.stop()
+
         if msgs.get('name') == 'playback_audio' and 'value' in msgs:
-            filename = msgs.get('value')
-            urllib.urlretrieve(FILESERVER + filename, '/dev/shm/' + filename)
-            pygame.mixer.music.load("/dev/shm/" + filename)
+            mp3data = base64.b64decode(msgs.get('value'))
+            f = open("/dev/shm/temp.mp3", 'wb')
+            f.write(mp3data)
+            f.close()
+            pygame.mixer.music.load("/dev/shm/temp.mp3")
             pygame.mixer.music.play(1)
 
 
 if __name__ == "__main__":
+    ws = create_connection(SERVER_ENDPOINT)
+    pygame.init()
     main()

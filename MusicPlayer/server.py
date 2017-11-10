@@ -6,29 +6,24 @@ app = Flask(__name__)
 from flask import request
 from flask import make_response
 
-from boto3.session import Session
 import httplib
 import urllib
 import json
 import os
+import base64
 from hashlib import md5
 import gevent
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 
-PORTNUMBER = 3000
-S3BUCKETNAME = "hogehoge"
+# ポート番号の指定
+PORTNUMBER = 4002
 
 # 汎用キューの初期化
 orderitem = {}
 
-# 音楽受け渡し用S3の初期化
-boto3 = Session(region_name='ap-northeast-1')
-s3 = boto3.client('s3', region_name='ap-northeast-1')
-
-
-@app.route('/hoge', methods=['GET', 'POST'])
-def hoge():
+@app.route('/webhook', methods=['GET', 'POST'])
+def webhook():
     if request.method == 'POST' and 'application/json' in request.headers.get('Content-Type', ""):
         event = request.json
         print event
@@ -41,8 +36,8 @@ def hoge():
         return ""
 
 
-@app.route('/send')
-def send():
+@app.route('/websocket')
+def websocket():
     global orderitem
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
@@ -59,6 +54,10 @@ def send():
                 if ret != "":
                     ws.send(json.dumps({'user_id': user_id, 'name': "playback_audio", 'value': ret}))
 
+                ret = get_data(user_id, "stop")
+                if ret == "stop":
+                    ws.send(json.dumps({'user_id': user_id, 'name': "stop", 'value': 'stop'}))
+
             gevent.sleep(0.3)
 
 
@@ -72,7 +71,7 @@ def get_data(user_id, queuename):
     if orderitem.get(user_id):
         if orderitem[user_id].get(queuename):
             ret = orderitem[user_id].get(queuename)
-            orderitem[user_id][queuename] = ""
+            del orderitem[user_id][queuename]
             return ret
         else:
             return ""
@@ -87,12 +86,17 @@ def request_handler(event, context):
 
     if intent == "music":
         searchword = utterance[:utterance.find(u'の音楽')]
-        filename = get_musicurl(searchword.encode("utf-8"))
-        if filename == "":
+        mp3_txt = get_musicdata(searchword.encode("utf-8"))
+        if mp3_txt == "":
             sentense = searchword.encode("utf-8") + "では何も見つかりませんでした。"
         else:
-            put_data(user_id, 'playback_audio', filename)
+            put_data(user_id, 'playback_audio', mp3_txt)
             sentense = searchword.encode("utf-8") + "の音楽を再生します。"
+
+    elif intent == "stop":
+        put_data(user_id, 'stop', "")
+        sentense = "音楽を停止しました"
+
     else:
         # それ以外は無音応答
         sentense = ""
@@ -111,7 +115,7 @@ def request_handler(event, context):
     )
 
 
-def get_musicurl(searchword):
+def get_musicdata(searchword):
     uri_base = 'itunes.apple.com'
     # Request headers.
     headers = {
@@ -133,7 +137,7 @@ def get_musicurl(searchword):
     conn.request("POST", "/search?%s" % params, body, headers)
     response = conn.getresponse()
     data = json.loads(response.read())
-    filename = ""
+    mp3_txt = ""
     if data.get("results"):
         url = data["results"][0]["previewUrl"]
 
@@ -146,9 +150,10 @@ def get_musicurl(searchword):
         if not os.path.exists(mp3strage + filename):
             urllib.urlretrieve(url, mp3strage + tmp_filename)
             os.system("/usr/local/bin/ffmpeg -i " + mp3strage + tmp_filename + ' -ab 192k -af "afade=t=in:ss=0:d=2,afade=t=out:st=28:d=2" ' + mp3strage + filename)
-            s3.upload_file(mp3strage + filename, S3BUCKETNAME, filename)
+            mp3 = open(mp3strage + filename, 'rt').read()
+            mp3_txt = base64.b64encode(mp3)
 
-    return filename
+    return mp3_txt
 
 
 if __name__ == "__main__":

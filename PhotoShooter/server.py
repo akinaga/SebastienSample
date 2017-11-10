@@ -92,7 +92,7 @@ def get_data(user_id, queuename):
     if orderitem.get(user_id):
         if orderitem[user_id].get(queuename):
             ret = orderitem[user_id].get(queuename)
-            orderitem[user_id][queuename] = ""
+            del orderitem[user_id][queuename]
             return ret
         else:
             return ""
